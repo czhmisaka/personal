@@ -42,7 +42,6 @@ def search_routers(ips = ''):
                 array[3] = str(i)
                 new_ip = '.'.join(array)
                 for port in port_list:
-                    time.sleep(0.5)
                     # clear()
                     dst_port = int(port)
                     # printList(routers)
@@ -57,6 +56,41 @@ def search_routers(ips = ''):
         t.join()
     # printList(routers)
     
+    
+    
+# 定义查询路由函数
+def search_routers_all():
+    
+    all_threads = []
+    for ip3 in range(1,255):
+        for ip2 in range(1,255):
+            for ip in range(1,255):
+                for i in range(1, 255):
+                    # clear()
+                    # printList(routers)
+                    array = [ 0,0 ,0 ,0]
+                    
+                    array[0] = str(ip3)
+                    array[1] = str(ip2)
+                    array[2] = str(ip)
+                    array[3] = str(i)
+                    new_ip = '.'.join(array)
+                    for port in port_list:
+                        # clear()
+                        dst_port = int(port)
+                        # printList(routers)
+                        # print('正在扫描：'+str(new_ip)+':'+str(dst_port))
+                        # 循环创建线程去链接该地址
+                        t = threading.Thread(target=check_ip, args=(new_ip, dst_port))
+                        t.start()
+                        # 把新建的线程放到线程池
+                        all_threads.append(t)
+                        
+        # 循环阻塞主线程，等待每一字子线程执行完，程序再退出
+        for t in all_threads:
+            t.join()
+        # printList(routers)
+        
 
 # 定义查询路由函数
 def search_routers_ip(ips = ''):
@@ -68,7 +102,7 @@ def search_routers_ip(ips = ''):
     # 存放线程列表池
     all_threads = []
     for port in range(65535):
-        # time.sleep(0.001)
+        time.sleep(0.05)
         # clear()
         dst_port = int(port)
         # printList(routers)
@@ -88,7 +122,7 @@ def search_routers_ip(ips = ''):
 
 # 创建访问IP列表方法
 def check_ip(new_ip, port):
-    # clear()
+    print('扫描端口'+str(new_ip)+':'+str(port))
     # 创建TCP套接字，链接新的ip列表
     scan_link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 设置链接超时时间
@@ -110,7 +144,6 @@ def check_ip(new_ip, port):
         lock.release()
     # print(routers)
 
-print("正在扫描..., 请稍等...")
 
 
 # 启动程序入口
@@ -120,6 +153,8 @@ print("正在扫描..., 请稍等...")
 # search_routers(input('>'))
 # search_routers()
 
-ip = '114.116.234.77'
-for x in range(10):
-    search_routers_ip(ip)
+# ip = '114.116.234.77'
+# search_routers_ip(ip)
+
+
+search_routers_all()

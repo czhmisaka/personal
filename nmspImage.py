@@ -633,7 +633,7 @@ class down():
         '''
         清屏/终端用 win
         '''
-        os.system("clear")
+        os.system("cls")
 
     
 class _downTool_commonThread(threading.Thread):
@@ -657,15 +657,12 @@ downTool_a.log_taskStatus = False
 downTool_a.cmdShow = True 
 downTool_a.tick = 1
 downTool_a.block_size = 1024*1024*10
-downTool_a.chunk_size = 256
-downTool_a.threadMaxNum = 50
+downTool_a.chunk_size = 512
+downTool_a.threadMaxNum = 30
 # downTool_a.start()
 
 
-
-
-f = open("headers.txt")
-user_agent = f.read()
+# user_agent = f.read()
 # headers = {"User-Agent": user_agent}
 headers = {
     'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)',
@@ -675,6 +672,12 @@ headers = {
 }
 
 headers = {}
+
+def getSoup(url):
+    re = requests.get(url, headers=headers)
+    re.encoding = "utf-8"
+    soup = BeautifulSoup(re.text, "lxml")
+    return soup
 
 def clearShell():
     os.system('clear')
@@ -689,98 +692,8 @@ def mkdir(path):
     else:
         return False
 
-def printList(list):
-    for x in list:
-        print(x)
-
 def GetDesktopPath():
     return os.path.join(os.path.expanduser("~"), 'Desktop')
-
-def downInDesktop(fileFolderName,urlList):
-    src = GetDesktopPath()+'/'+fileFolderName
-    mkdir(src)
-    print('start Download')
-    for x in range(len(urlList)):
-        # clearShell()
-        print('（0/3）下载进度   :   '+str(x/len(urlList)*100)+'%')
-        noobSrc = urlList[x].split('/')[len(urlList[x].split('/'))-1].split('.')
-        try:
-            saveImg(urlList[x],src+'/'+str(x)+'.'+noobSrc[1])
-        except:
-            print('Warning:down fail')
-    print('结束下载')
-
-
-class downThread (threading.Thread):
-    def __init__(self, fileFolderName, urlList, startNum, endNum):
-        threading.Thread.__init__(self)
-        self.fileFolderName = fileFolderName
-        self.urlList = urlList
-        self.start1 = startNum
-        self.end = endNum
-    def run(self):
-        print("开始线程：" + self.name)
-        down(self.fileFolderName,self.urlList,self.start1,self.end)
-        print("退出线程：" + self.name)
-        
-
-def down(fileFolderName, urlList, startNum, endNum):
-    src = GetDesktopPath() + '/' + fileFolderName
-    mkdir(src)
-    # print('start Download')
-    for x in range(len(urlList)):
-        if x > startNum and x <= endNum:
-            # clearShell()
-            # print('（0/3）下载进度   :   ' + str(x / len(urlList) * 100) + '%')
-            noobSrc = urlList[x].split('/')[len(urlList[x].split('/')) - 1].split('.')
-            downTool_a.append(urlList[x],path=src)
-            # try:
-            # saveImg(urlList[x], src + '/' + str(x) + '.' + noobSrc[1])
-            # except:
-            #     print('Warning:down fail')
-    # print('结束下载')
-
-def startDown(num,folderName,urllist):
-    x = 0
-    thread1= []
-    while x<len(urllist):
-        thread1.append(downThread(folderName,urllist,x,x+num))
-        x = x + num
-    print(thread1)
-    for i in thread1:
-        i.start()
-
-
-
-
-def saveImg(pic_link, src):
-    print(src)
-    # a.addMission(pic_link,fileName=s,path='',isLarge=True)
-    return 0
-    # pp = requests.get(pic_link, headers=headers)
-    # print("当前正在下载")
-    # if str(pp) == "<Response [404]>":
-    #     pp = requests.get(pic_link, headers=headers)
-    #     if str(pp) == "<Response [404]>":
-    #         print("404")
-    #         return False
-    #     else:
-    #         pth = src  # 设置图片名
-    #         print("当前正在下载"+pth)
-    #         with open(pth, "wb") as f:
-    #             for chunk in pp:  # 读取每个图片链接的二进制数据
-    #                 f.write(chunk)  # 写入
-    #         print("第%s张下载好" % src)
-    #         return True
-    # else:
-    #     pth = src  # 设置图片名
-    #     print("当前正在下载"+pth)
-    #     with open(pth, "wb") as f:
-    #         for chunk in pp:  # 读取每个图片链接的二进制数据
-    #             f.write(chunk)  # 写入
-    #     print("第%s张下载好" % src)
-    #     return True
-
 
 
 
@@ -819,51 +732,40 @@ def start_nmsp1(pages1,size1):
                 num = num+1
                 # downList.append(z['url'])
             # startDown(1,'nmsp/'+str(x['title']),downList)
-            
         except:
             continue
 
-def start4(x): # 用于下载更多的小黄图
-    re = requests.get("https://nmsp42.com/api/?d=pc&c=picture&m=detail&timestamp=1576331844203&id="+str(x))
+
+def SKW_goodsGet(pageNum,city):
+    main_url="https://www.vvic.com/apic/search/asy?merge=1&algo=134&searchCity="+str(city)+"&currentPage="+str(pageNum)
+    re = requests.get(main_url, headers=headers)
     re.encoding = "utf-8"
-    soup = BeautifulSoup(re.text,'lxml')
-    zxc = soup.select('p')
-    zxc = str(zxc)
-    zxc = zxc.split("<p>")[1].split("</p>")[0]
-    # print(zxc)
-    jk = json.loads(str(zxc))
-    # print(jk['data']['pics'])
-    # return 0
-    jk = jk['data']['pics']
-    jk = jk.split("[")[1].split("]")[0]
-    jk = jk.split('},')
-    iop = []
-    for qwe in jk:
-        # print(qwe.split('"url":"')[1])
-        iop.append(qwe.split('"url":"')[1].split('"')[0])
-    printList(iop)
-    # return 0
-    v = []
-    for c in iop:
-        v.append(c.replace("\/","/"))
-
-    printList(v)
-    startDown(20,'妹妹de\id+'+str(x),v)
-
-key = input("1.按页下载 2.ID下载 \n >")
-if key == '1':
-    for x in range(100):
-        start_nmsp1(x,100)
-    # page = input("pages >")
-    # size = input("size >")
-    # start_nmsp1(page,size)
-elif key == '2':
-    nameid = input("ID >")
-    start4(nameid)
+    soup = BeautifulSoup(re.text, "lxml")
+    j_main = json.loads(str(soup.select('p')[0].text))
+    downPath = "D:/SKW/"
+    mkdir(downPath)
+    for x in j_main['data']['search_page']['recordList']:
+        try:
+            downTool_a.addMission('http:'+x['index_img_url'],path=downPath+str(x['title'])+'.jpeg')
+        except :
+            continue
 
 
+def SKW_start():
+    downTool_a.start()
+    lista = []
+    citylist = [ 'gz','pn','hznz','jfn','xt','hz']
+    for q in citylist:
+        for x in range(100):
+            lista.append(_downTool_commonThread(SKW_goodsGet,(x+1,q),str(q)+'/'+str(x)))
+    # SKW_goodsGet(1,'gz')
+    for x in lista:
+        x.start()
 
 
-
-
-
+def TT_msgGet():
+    mainUrl = 'https://www.toutiao.com/'
+    soup = getSoup(mainUrl)
+    print(soup)
+    
+TT_msgGet()
