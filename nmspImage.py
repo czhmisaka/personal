@@ -762,10 +762,3 @@ def SKW_start():
     for x in lista:
         x.start()
 
-
-def TT_msgGet():
-    mainUrl = 'https://www.toutiao.com/'
-    soup = getSoup(mainUrl)
-    print(soup)
-    
-TT_msgGet()
