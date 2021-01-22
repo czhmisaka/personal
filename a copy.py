@@ -6,8 +6,58 @@ import sys
 import os
 from appium.webdriver.common.touch_action import TouchAction
 import json 
+import numpy as np
+import pathlib
+import sys
+from cv2 import cv2 as cv
+
+
+# 
 
 driver = {}
+
+def imgFormat(path):
+    
+    return True
+
+def cv_imread(filePath):
+    cv_img=cv.imdecode(np.fromfile(filePath,dtype=np.uint8),-1)
+    return cv_img
+
+def change(path):
+    path_str = path
+    alpha = 0.02
+    img = cv_imread(str(path))
+    if img is None: 
+        return 
+    img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY) / 255
+    h_mid = img_gray.shape[0] // 2
+    w_mid = img_gray.shape[1] // 2
+    u = h_mid
+    while u >= 0 and np.mean(img_gray[u]) > alpha: u -= 1
+    b = h_mid
+    while b < img_gray.shape[0] and np.mean(img_gray[b]) > alpha: b += 1
+    l = w_mid
+    while l >= 0 and np.mean(img_gray[:, l]) > alpha : l -= 1
+    r = w_mid
+    while r < img_gray.shape[1] and np.mean(img_gray[:, r]) > alpha: r += 1
+    try:
+        asd = 'a_'
+        pathList = path.split('/')
+        pathName = ''
+        for x in range(len(pathList)):
+            if x==0:
+                pathName = pathList[x]
+            elif x!=len(pathList):
+                pathName = pathName+'/'+pathList[x]
+            else:
+                pathName = pathName+'/'+ 'a_'+pathList[x] + '.png'
+        print(pathName)
+        cv.imencode('.png', img[u + 1:b - 1, l + 1:r - 1])[1].tofile(f'{pathName}')
+    except:
+        print('e')
+
+
 
 # 获取桌面路径
 def getDesktopPath():
@@ -43,6 +93,7 @@ def SaveScreenShot(path,name=''):
                 print(testPath)
                 if checkFile(testPath):
                     driver.get_screenshot_as_file(testPath)
+                    change(testPath)
                     return x
             return "max"
         else:
@@ -50,6 +101,7 @@ def SaveScreenShot(path,name=''):
                 testPath = path+'/'+str(name)+str(x)+'.png'
                 if checkFile(testPath):
                     driver.get_screenshot_as_file(testPath)
+                    change(testPath)
                     return x
             return "max"
     except:
@@ -70,6 +122,7 @@ def printList(lists):
 #进入昵称为name的好友的朋友圈的点击逻辑
 def enter_pengyouquan(name):
     driver.find_element_by_id('com.tencent.mm:id/f8y').click()  #点击搜索图标
+    # driver.find_element_by_id('com.tencent.mm:id/cn_').click()
     time.sleep(2)
     driver.find_element_by_id('com.tencent.mm:id/bhn').send_keys(name)  #输入搜索文字
     time.sleep(2)
@@ -78,7 +131,7 @@ def enter_pengyouquan(name):
     driver.find_element_by_id('com.tencent.mm:id/cj').click()  #点击聊天界面右上角三个小点
     time.sleep(1)
     driver.find_element_by_id('com.tencent.mm:id/f3y').click() #点击头像
-    time.sleep(1)
+    time.sleep(3)
     driver.find_element_by_id('com.tencent.mm:id/coy').click() #点击朋友圈
     time.sleep(1)
     
@@ -204,7 +257,7 @@ def toPYQ():
     tap(454,296)
     time.sleep(3)    
 
-def kick(times=2):
+def kick(times=0.5):
     time.sleep(times)
 
 def main_saveByName(nameList):
@@ -228,11 +281,11 @@ desired_caps = {
 asd = {
     "platformName": "Android",
     "platformVersion": "10",
-    "deviceName": "V1950A",
+    "deviceName": "HA19RRAZ",
     "appPackage": "com.tencent.mm",
     "appActivity": "com.tencent.mm.ui.LauncherUI",
-    "noReset": "true"
-    # "automationName":'uiautomator2'
+    "noReset": "true",
+    "automationName":"uiautomator2"
 }
 driver = {}
 pyq = {}
@@ -241,14 +294,22 @@ nameList = []
 fr = open(getDesktopPath()+'nameList.txt', encoding='utf-8',errors='ignore')
 nameList = fr.read().split('\n')
 num = 0
+
+# 防止文件夹名称重复
+preName = '' 
+preNum = 0
+# 防止文件夹名称重复
+
 for xx in nameList:
     try:
         if xx == "":
-            break
+            continue
         x = str(xx)
+        list = []
         print(nameList,x,'次数',str(num))
         try:
             driver.quit()
+            print('重开')
         except:
             print('开始')
         driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', asd)
@@ -257,14 +318,16 @@ for xx in nameList:
         enter_pengyouquan(x) 
         kick(5)
         # toPYQ()
-        namePath = getDesktopPath()+'\\test\\'+str(x)
+        
+        timeNow = time.strftime("%Y-%m-%d", time.localtime())
+        namePath = getDesktopPath()+'\\test\\'+str(x)+str(timeNow)
         mkdirFile(namePath)
-        for x in range(10):
+        for x in range(20):
             swipe_down('','',1000)
-            kick(3)
-        for x in range(11):
+            kick(1)
+        for x in range(21):
             swipe_up2()
-            kick(3)
+            kick(0.5)
         try:
             comeIn = driver.find_element_by_id('com.tencent.mm:id/cpu')
             comeIn.click()
@@ -276,31 +339,50 @@ for xx in nameList:
                 kick()
             except:
                 print('clickFail')
-        try:
-            leak = driver.find_element_by_id('com.tencent.mm:id/g95')
-            leak.click()
-            kick()   
-        except:
-            try:
-                leak = driver.find_element_by_id('com.tencent.mm:id/g95')
-                leak.click()
-                kick()   
-            except:
-                print('fuck2')
+        # try:
+        #     leak = driver.find_element_by_id('com.tencent.mm:id/g95')
+        #     leak.click()
+        #     kick()   
+        # except:
+        #     try:
+        #         leak = driver.find_element_by_id('com.tencent.mm:id/g95')
+        #         leak.click()
+        #         kick()   
+        #     except:
+        #         print('fuck2')
         for y in range(10000):
-            kick(2)
+            kick()
             name = str(y)+'_'
             try:
                 contextObj = driver.find_element_by_class_name('android.widget.TextView')
                 name = contextObj.text.replace('\n', '').replace('\r', '').strip()
+                name = name.replace('\\','')
+                name = name.replace('/',' ')
+                kick()
+                timeObj = driver.find_element_by_id('android:id/text1')
+                timesss = timeObj.text
+                timesss = timesss.replace(':','').strip()
+                print(timesss)
             except:
                 print('context fail')
-            mkdirFile(namePath+'/'+name)    
-            kick(2)
-            maxNum = SaveScreenShot(namePath+'/'+name)
+            mkdirFile(namePath+'/'+timesss+name)    
+            maxNum = SaveScreenShot(namePath+'/'+timesss+name)
             if maxNum == 'max':
                 break
-            kick(2)
+            tap(X(50),Y(50),800)
+            kick()
+            try:
+                save = driver.find_elements_by_id('com.tencent.mm:id/gam')
+            except:
+                print('保存失败')
+            else:
+                for c in save:
+                    if c.text == '保存图片' or c.text == '保存视频':
+                        num = num + 1
+                        print('当前轮数:'+str(y)+'    已保存图片数量:'+str(num))
+                        c.click()
+                        break
+            kick()
             try:
                 swipe_r2l()
             except:
@@ -310,50 +392,7 @@ for xx in nameList:
                 except:
                     print('fail')
     except:
-        nameList.append(x)
+        nameList.append(xx)
+        
 
 
-
-
-
-
-            
-            
-            # print('当前轮数:'+str(y)+'    已保存图片数量:'+str(num))
-            # kick(2)
-            # pic_list = driver.find_elements_by_accessibility_id('图片') 
-            # for x in range(len(pic_list)):
-            #     if len(driver.find_elements_by_accessibility_id('图片')) == 0:
-            #         tap(X(50),Y(25))
-            #         break
-            #     if not driver.find_elements_by_accessibility_id('图片')[x]:
-            #         tap(X(50),Y(25))
-            #         break
-            #     ele = driver.find_elements_by_accessibility_id('图片')[x]
-            #     # TouchAction(driver).tap(ele).perform()
-            #     ele.click()
-            #     time.sleep(2)
-            #     tap(X(50),Y(50),800)
-            #     time.sleep(1)
-            #     try:
-            #         save = driver.find_elements_by_id('com.tencent.mm:id/gam')
-            #     except:
-            #         tap(X(50),Y(25))
-            #         time.sleep(1)
-            #         continue
-            #     else:
-            #         for c in save:
-            #             if c.text == '保存图片':
-            #                 num = num + 1
-            #                 print('当前轮数:'+str(y)+'    已保存图片数量:'+str(num))
-            #                 c.click()
-            #                 break
-            #         time.sleep(1)
-            #         try:
-            #             back = driver.find_element_by_class_name('android.widget.ImageView')
-            #             back.click()
-            #             time.sleep(1)
-            #         except:
-            #             tap(X(50),Y(25))
-            #             time.sleep(1)
-            # swipe_down('','')
