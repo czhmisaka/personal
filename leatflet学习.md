@@ -21,7 +21,7 @@
 **this.map为map对象**
 
 ### 初始化地图对象
-#### 函数
+#### 函数示例
 示例:
 
 ```javascript
@@ -30,7 +30,8 @@ this.map = L.map("map", {
     zoom: 14,
     zoomControl: false,
     doubleClickZoom: false,
-    attributionControl: false
+    attributionControl: false,    
+    preferCanvas: true
 });
 L.tileLayer(
     "http://mt0.google.cn/vt/lyrs=y@160000000&hl=zh-CN&gl=CN&src=app&y={y}&x={x}&z={z}&s=Ga",
@@ -39,9 +40,10 @@ L.tileLayer(
 1. L即为上文所引入的leaflet对象
 2. center参数中为 **[经度，纬度]**
 3. **tileLayer** 叠加了一层数据层（也就是地图数据）
+4. 建议加入 **preferCanvas** 这个有效提升性能，但是不支持ie9以下的ie浏览器（就是放弃用svg渲染，改用 canvas 渲染【好像是调用了webgl】）
 
 ### 设立marker
-#### 函数
+#### 函数示例
 示例:
 ```javascript
 let marker_name = L.marker([51.5, -0.09],{
@@ -52,11 +54,32 @@ let marker_name = L.marker([51.5, -0.09],{
 }).addTo(this.map)
 
 ```
-向地图中的 **[经度，纬度]** 中插入一个标签
+1. 向地图中的 **[经度，纬度]** 中插入一个标签
 
+**示例2：如何添加自定义图标文件**
+
+```javascript
+let img = require('@/assets/marker.png')
+let myIcon = L.icon({
+    iconUrl: img,
+    // iconUrl:'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png',
+    iconSize: [80,80 ],
+    iconAnchor: [40, 80],
+    popupAnchor: [-3, -76],
+});
+L.marker([lat, lng], {
+    title: JSON.stringify({
+    ...e.latlng
+    }),
+    name:'Are u sure?',
+    icon: myIcon,
+    alt: 'linkPoint'
+}).addTo(this.map)
+```
+1. 使用本地文件需要注意路径引入的问题
 
 ### 绘制圆点 **.circle()**
-#### 函数
+#### 函数示例
 示例：
 
 ```javascript
@@ -71,11 +94,11 @@ L.circle([40, 116], 500, {
 3. 样式对象 **Json**
 
 ### 遍历图层
-#### 函数
+#### 函数示例
 示例
 
 ### 绑定鼠标事件(点击/滑动/滚轮)
-#### 函数
+#### 函数示例
 **示例**:
 
 ```javascript
@@ -88,7 +111,7 @@ this.map.on('mousemove', this.mousemove)
 事件列表我就不列了，网上一堆
 
 ### 多边形绘制
-#### 函数
+#### 函数示例
 示例:
 
 ```javascript
@@ -97,14 +120,14 @@ L.polygon(pointList).addTo(this.map)
 **pointList** 就是一个点的数组
 
 ### 绘制点对点线
-#### 函数
+#### 函数示例
 示例:
 
 ```javascript
 ```
 
 ### 主动刷新/屏幕自适应/数据更新事件
-#### 函数
+#### 函数示例
 示例:
 
 ```javascript
@@ -127,6 +150,9 @@ window.event.cancelBubble = true;
 v-on:mousemove.stop=""
 ```
 即可
+
+### 经纬度和公里的换算
+可能需要前后端核验操作
 
 
 ## 最后修改时间 
