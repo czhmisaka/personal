@@ -95,7 +95,26 @@ L.circle([40, 116], 500, {
 
 ### 遍历图层
 #### 函数示例
-示例
+示例 - 普通
+```javascript
+this.map.eachLayer((layer)=>{
+    console.log(layer)
+})
+```
+**layer即为图层对象，注意如果之后使用了canvasMarker做性能优化的话，可能无法识别marker图层**
+
+示例2 - 与删除图层同用
+
+```javascript
+ clearLayer(name = '') {
+    this.map.eachLayer((layer) => {
+        if (layer.options.name == name)
+        this.map.removeLayer(layer)
+    })
+},
+```
+这个就是一个很典型的通过name来删除图层的方式，实际使用的时候可以通过很多方案，非常自由
+
 
 ### 绑定鼠标事件(点击/滑动/滚轮)
 #### 函数示例
@@ -121,8 +140,8 @@ L.polygon(pointList).addTo(this.map)
 
 ### 绘制点对点线
 #### 函数示例
+*PS:其实使用多边形绘制的那个函数（**polygon**），然后只穿入两个点就可以*
 示例:
-
 ```javascript
 ```
 
@@ -154,6 +173,8 @@ v-on:mousemove.stop=""
 ### 经纬度和公里的换算
 可能需要前后端核验操作
 
+
+## 性能优化相关
 
 ## 最后修改时间 
 2021年1月27日 20点44分

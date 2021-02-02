@@ -6,6 +6,8 @@ tasklist /fi "imagename eq nginx.exe"
 ```
 
 ### 目前的配置文档
+
+
 ```conf
 
 worker_processes  1;
@@ -24,14 +26,6 @@ http {
         location /map {
             proxy_pass http://127.0.0.1:8080;
         }
-
-        location /js {
-            proxy_pass http://127.0.0.1:8080;
-        }
-        location / {
-            root   html;
-            index  index.html index.htm;
-        }
         error_page   500 502 503 504  /50x.html;
         location = /50x.html {
             root   html;
@@ -40,3 +34,7 @@ http {
     include servers/*;
 }
 ```
+
+1. 监听80 端口
+2. 捕获 */map* 路径
+3. 跳转到本地8080端口继续访问
