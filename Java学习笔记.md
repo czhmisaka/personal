@@ -17,3 +17,7 @@
 ```java
  javac -encoding UTF-8 EmployeeTest.java
 ```
+
+## 需要学习的项目 
+1. 启动java环境后的调试方案
+2. 开发流程和自我测试流程
