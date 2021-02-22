@@ -2,7 +2,8 @@
 
 ## 前言
 之前java基础就是0
-
+所以总是遇到奇怪的问题
+还喜欢钻牛角尖
 
 ## 环境
 
@@ -18,6 +19,17 @@
  javac -encoding UTF-8 EmployeeTest.java
 ```
 
+## springframework
+
+## 一些奇奇怪怪的问题和记录（maven）
+1. 用idea打开项目时要选中项目根目录的pom.xml文件
+2. 
+
+
+## 一些莫名其妙的尝试
+1. router管理？或者应该说api管理
+2. 
 ## 需要学习的项目 
 1. 启动java环境后的调试方案
 2. 开发流程和自我测试流程
+3. 
