@@ -5,6 +5,17 @@
 tasklist /fi "imagename eq nginx.exe"
 ```
 
+### 关闭当前nginx服务
+```ssh
+nginx -s stop
+```
+
+### 重启当前nginx服务
+```ssh
+nginx -s reload
+```
+在配置修改后需要重启才能生效
+
 ### 目前的配置文档
 
 
