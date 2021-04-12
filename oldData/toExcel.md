@@ -4,7 +4,7 @@
     function JSONToExcelConvertor(JSONData, FileName) {
         //先转化json
         var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-        var excel = '<table>';
+        var excel = '<table>';  
         var row = "<tr>";
         //设置表头
         var keys = Object.keys(JSONData[0]);
